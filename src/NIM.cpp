@@ -2,11 +2,19 @@
 #include <cstdlib>
 #include <ctime>
 
+using namespace std;
+
 //TODO: Create a function named isValidMove(). It needs to have boolean return type
 //      and it needs to take two parameters: int userMove and int stones.
 //      This function is to determine if the move is valid or not. If the user move
 //      is less than 1, greater than 3, or if their move is greater than the number
 //      of available stones, then return false. Else return true.
+bool isValidMove(int userMove, int stones) {
+    if (userMove < 1 || userMove > 3 || userMove > stones) {
+        return false;
+    }
+    return true;
+}
 
 //TODO: Create a function named getUserMove(). It needs to have a int return type and
 //      it needs to take one parameter: int stones.
@@ -17,6 +25,20 @@
 //         then have them input their answer
 //      3) if the move is valid, return the user's move. Else print "Invalid amount."
 //         (hint: use the isValidMove function to test if the move is valid)
+int getUserMove(int stones) {
+    int move;
+
+    while (true) {
+        cout << "How many stones would you like to take (1-3)? ";
+        cin >> move;
+
+        if (isValidMove(move, stones)) {
+            return move;
+        } else {
+            cout << "Invalid amount." << endl;
+        }
+    }
+}
 
 //TODO: Create a function named computerMove() that has a return type of int. It needs
 //      to take one parameter: int stones.
@@ -24,26 +46,65 @@
 //      take on their move.
 //      If the number of stones = 1 or 2 then return 1. If stones = 3 then return 2.
 //      If stones = 4 then return 3. Else return a random number between 1 and 3.
+int computerMove(int stones) {
+    if (stones == 1 || stones == 2) {
+        return 1;
+    } else if (stones == 3) {
+        return 2;
+    } else if (stones == 4) {
+        return 3;
+    } else {
+        return rand() % 3 + 1;
+    }
+}
 
 //TODO: Create a function of type bool named checkWin(). It will take one parameter: int stones
 //      This one should be very simple, if there are no stones left then return true else 
 //      return false.
+bool checkWin(int stones) {
+    if (stones <= 0) {
+        return true;
+    }
+    return false;
+}
 
 int main() {
+    srand(time(0));
+
     //TODO: Start the stone count at 16 and tell the user how many stones are in the 
     //      pile
+    int stones = 16;
+    cout << "There are " << stones << " stones in the pile." << endl;
 
     //TODO: Create a loop that will only break when the game is over.
     //      Within the loop, have the user take their move then subtract
     //      the result of the user's move with the total number of stones.
+    while (true) {
 
-    //TODO: Once again print how many stones are remaining and then check the
-    //      the win condition.
+        int userMove = getUserMove(stones);
+        stones -= userMove;
 
-    //TODO: Now have the computer take its turn. Subtract the computer's move
-    //      from the total number of stones.
+        //TODO: Once again print how many stones are remaining and then check the
+        //      the win condition.
+        cout << "Stones remaining: " << stones << endl;
+        if (checkWin(stones)) {
+            cout << "You win!" << endl;
+            break;
+        }
 
-    //TODO: Print the total number of stones and then check the win condition
+        //TODO: Now have the computer take its turn. Subtract the computer's move
+        //      from the total number of stones.
+        int compMove = computerMove(stones);
+        cout << "Computer takes " << compMove << " stones." << endl;
+        stones -= compMove;
+
+        //TODO: Print the total number of stones and then check the win condition
+        cout << "Stones remaining: " << stones << endl;
+        if (checkWin(stones)) {
+            cout << "Computer wins!" << endl;
+            break;
+        }
+    }
 
     return 0;
 }
