@@ -1,110 +1,202 @@
+/*
+Each flight must store the following information:
+1) Flight number
+2) Destination
+3) Scheduled departure time
+4) Current time
+5) Delay time in minutes
+6) Whether the flight is cancelled
+7) Flight status
+
+You must write a function that converts military time (HHMM) into minutes since midnight.
+Examples:
+0900 → 540 minutes
+1345 → 825 minutes
+1500 → 900 minutes
+All flight times must be converted using this function.
+
+The flight status must be represented using an enumerator with the following possible values:
+1) ON_TIME
+2) DELAYED
+3) BOARDING
+4) DEPARTED
+5) CANCELLED
+
+Write a function that determines the correct flight status using the rules below.
+These rules must be applied in the correct order.
+1) If the flight is cancelled, the status is CANCELLED.
+2) If the current time is equal to or later than the scheduled departure time, the status is DEPARTED.
+3) If the flight has a delay (delay time greater than 0) and the current time is before the scheduled departure time, the status is DELAYED.
+4) If the current time is within 30 minutes of the scheduled departure time, but still before departure, and the flight is not delayed, the status is BOARDING.
+5) If none of the above conditions apply, the flight is ON_TIME.
+*/
+
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+#include <string>
 
 using namespace std;
 
-//TODO: Create a function named isValidMove(). It needs to have boolean return type
-//      and it needs to take two parameters: int userMove and int stones.
-//      This function is to determine if the move is valid or not. If the user move
-//      is less than 1, greater than 3, or if their move is greater than the number
-//      of available stones, then return false. Else return true.
-bool isValidMove(int userMove, int stones) {
-    if (userMove < 1 || userMove > 3 || userMove > stones) {
-        return false;
-    }
-    return true;
-}
+// =====================
+// Enum for flight status
+// =====================
+enum FlightStatus { ON_TIME, DELAYED, BOARDING, DEPARTED, CANCELLED };
 
-//TODO: Create a function named getUserMove(). It needs to have a int return type and
-//      it needs to take one parameter: int stones.
-//      The purpose of the function is to get the users move. You will need to
-//      do the following steps in the function:
-//      1) create a a loop that will only break when a valid move is made
-//      2) inside the loop ask the user how many stones they would like to take and
-//         then have them input their answer
-//      3) if the move is valid, return the user's move. Else print "Invalid amount."
-//         (hint: use the isValidMove function to test if the move is valid)
-int getUserMove(int stones) {
-    int move;
+// =====================
+// Struct for flight dataa
+// =====================
+struct Flight {
+    string flightNumber;
+    string destination;
+    int scheduledDeparture;
+    int currentTime;
+    int delayMinutes;
+    bool isCancelled;
+    FlightStatus status;
+  };
 
-    while (true) {
-        cout << "How many stones would you like to take (1-3)? ";
-        cin >> move;
+  
 
-        if (isValidMove(move, stones)) {
-            return move;
-        } else {
-            cout << "Invalid amount." << endl;
-        }
-    }
-}
+// =====================
+// Function prototypes
+// =====================
+// ** Please add the proper parameters **
+int militaryToMinutes(int militaryTime);
+void updateFlightStatus(Flight& flight);
+string statusToString(FlightStatus status);
+void displayFlight(const Flight& flight);
 
-//TODO: Create a function named computerMove() that has a return type of int. It needs
-//      to take one parameter: int stones.
-//      The purpose of this function is to program how many stones the computer will
-//      take on their move.
-//      If the number of stones = 1 or 2 then return 1. If stones = 3 then return 2.
-//      If stones = 4 then return 3. Else return a random number between 1 and 3.
-int computerMove(int stones) {
-    if (stones == 1 || stones == 2) {
-        return 1;
-    } else if (stones == 3) {
-        return 2;
-    } else if (stones == 4) {
-        return 3;
-    } else {
-        return rand() % 3 + 1;
-    }
-}
-
-//TODO: Create a function of type bool named checkWin(). It will take one parameter: int stones
-//      This one should be very simple, if there are no stones left then return true else 
-//      return false.
-bool checkWin(int stones) {
-    if (stones <= 0) {
-        return true;
-    }
-    return false;
-}
-
+// =====================
+// Main
+// =====================
 int main() {
-    srand(time(0));
 
-    //TODO: Start the stone count at 16 and tell the user how many stones are in the 
-    //      pile
-    int stones = 16;
-    cout << "There are " << stones << " stones in the pile." << endl;
+    Flight flight1;
+    flight1.flightNumber = "UA101";
+    flight1.destination = "Denver";
+    flight1.scheduledDeparture = militaryToMinutes(1500);
+    flight1.currentTime = militaryToMinutes(1300);
+    flight1.delayMinutes = 0;
+    flight1.isCancelled = false;
+    flight1.status = ON_TIME;
 
-    //TODO: Create a loop that will only break when the game is over.
-    //      Within the loop, have the user take their move then subtract
-    //      the result of the user's move with the total number of stones.
-    while (true) {
+    Flight flight2;
+    flight2.flightNumber = "DL202";
+    flight2.destination = "Atlanta";
+    flight2.scheduledDeparture = militaryToMinutes(1400);
+    flight2.currentTime = militaryToMinutes(1345);
+    flight2.delayMinutes = 0;
+    flight2.isCancelled = false;
+    flight2.status = ON_TIME;
 
-        int userMove = getUserMove(stones);
-        stones -= userMove;
+    Flight flight3;
+    flight3.flightNumber = "AA303";
+    flight3.destination = "Dallas";
+    flight3.scheduledDeparture = militaryToMinutes(1600);
+    flight3.currentTime = militaryToMinutes(1500);
+    flight3.delayMinutes = 45;
+    flight3.isCancelled = false;
+    flight3.status = ON_TIME;
 
-        //TODO: Once again print how many stones are remaining and then check the
-        //      the win condition.
-        cout << "Stones remaining: " << stones << endl;
-        if (checkWin(stones)) {
-            cout << "You win!" << endl;
-            break;
-        }
+    Flight flight4;
+    flight4.flightNumber = "SW404";
+    flight4.destination = "Phoenix";
+    flight4.scheduledDeparture = militaryToMinutes(1200);
+    flight4.currentTime = militaryToMinutes(1230);
+    flight4.delayMinutes = 0;
+    flight4.isCancelled = false;
+    flight4.status = ON_TIME;
 
-        //TODO: Now have the computer take its turn. Subtract the computer's move
-        //      from the total number of stones.
-        int compMove = computerMove(stones);
-        cout << "Computer takes " << compMove << " stones." << endl;
-        stones -= compMove;
+    Flight flight5;
+    flight5.flightNumber = "BA505";
+    flight5.destination = "London";
+    flight5.scheduledDeparture = militaryToMinutes(1800);
+    flight5.currentTime = militaryToMinutes(1600);
+    flight5.delayMinutes = 0;
+    flight5.isCancelled = true;
+    flight5.status = ON_TIME;
 
-        //TODO: Print the total number of stones and then check the win condition
-        cout << "Stones remaining: " << stones << endl;
-        if (checkWin(stones)) {
-            cout << "Computer wins!" << endl;
-            break;
-        }
-    }
+    updateFlightStatus(flight1);
+    displayFlight(flight1);
+    cout << endl;
+
+    updateFlightStatus(flight2);
+    displayFlight(flight2);
+    cout << endl;
+
+    updateFlightStatus(flight3);
+    displayFlight(flight3);
+    cout << endl;
+
+    updateFlightStatus(flight4);
+    displayFlight(flight4);
+    cout << endl;
+
+    updateFlightStatus(flight5);
+    displayFlight(flight5);
 
     return 0;
 }
+
+// =====================
+// Function definitions
+// =====================
+
+int militaryToMinutes(int militaryTime) {
+    int hours = militaryTime / 100;
+    int minutes = militaryTime % 100;
+    return hours * 60 + minutes;
+}
+
+void updateFlightStatus(Flight& flight) {
+
+    // Rule 1: If the flight is cancelled
+    if (flight.isCancelled) {
+        flight.status = CANCELLED;
+        return;
+    }
+
+    // Rule 2: If current time is equal to or later than scheduled departure
+    if (flight.currentTime >= flight.scheduledDeparture) {
+        flight.status = DEPARTED;
+        return;
+    }
+
+    // Rule 3: If flight has a delay and is before departure
+    if (flight.delayMinutes > 0 && flight.currentTime < flight.scheduledDeparture) {
+        flight.status = DELAYED;
+        return;
+    }
+
+    // Rule 4: Within 30 minutes of departure, not delayed, and before departure
+    if ((flight.scheduledDeparture - flight.currentTime) <= 30 &&
+        flight.currentTime < flight.scheduledDeparture &&
+        flight.delayMinutes == 0) {
+        flight.status = BOARDING;
+        return;
+    }
+
+    // Rule 5: Otherwise, on time
+    flight.status = ON_TIME;
+}
+
+string statusToString(FlightStatus status) {
+    switch (status) {
+        case ON_TIME:   return "ON TIME";
+        case DELAYED:   return "DELAYED";
+        case BOARDING:  return "BOARDING";
+        case DEPARTED:  return "DEPARTED";
+        case CANCELLED: return "CANCELLED";
+        default:        return "UNKNOWN";
+    }
+}
+
+void displayFlight(const Flight& flight) {
+    cout << "Flight Number: " << flight.flightNumber << endl;
+    cout << "Destination: " << flight.destination << endl;
+    cout << "Scheduled Departure (minutes since midnight): " << flight.scheduledDeparture << endl;
+    cout << "Current Time (minutes since midnight): " << flight.currentTime << endl;
+    cout << "Delay Minutes: " << flight.delayMinutes << endl;
+    cout << "Cancelled: " << (flight.isCancelled ? "Yes" : "No") << endl;
+    cout << "Status: " << statusToString(flight.status) << endl;
+}
+
